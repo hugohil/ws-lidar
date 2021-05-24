@@ -1,17 +1,29 @@
+const args = require('minimist')(process.argv.slice(2))
+
 const RPLidar = require('node-rplidar')
-const lidar = RPLidar('/dev/tty.SLAB_USBtoUART')
 const WebSocket = require('ws')
 
 let ID = 0
 
+const serial = args.serial || '/dev/ttyUSB0'
+const lidar = RPLidar(serial)
+
+
+const host = args.host || '127.0.0.1'
+const port = args.port || 8080
+
 function setupWS () {
-  const ws = new WebSocket('ws://127.0.0.1:8080',  {
+  const ws = new WebSocket(`ws://${host}:${port}`,  {
     perMessageDeflate: false,
-  
   })
   
   ws.on('open', () => {
     ws.send(`lidar-register/${ID}`)
+
+    lidar.on('data', data => {
+      data.serial = ID
+      ws.send(JSON.stringify(data))
+    })
   })
   
   ws.on('message', (data) => {
@@ -21,9 +33,12 @@ function setupWS () {
     }
   })
   
-  lidar.on('data', data => {
-    data.serial = ID
-    ws.send(JSON.stringify(data))
+  ws.on('error', console.warn)
+  ws.on('close', (code) => {
+    console.log('closed with code', code)
+    setTimeout(() => {
+      setupWS()
+    }, 1500)
   })
 }
 
