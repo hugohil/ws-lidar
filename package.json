@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "node-rplidar": "git+https://git@github.com/eriknoorland/node-rplidar.git",
+    "ws": "^7.4.5"
+  }
+}
