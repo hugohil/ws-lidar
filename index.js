@@ -27,7 +27,7 @@ function setupWS () {
   })
   
   ws.on('message', (data) => {
-    console.log(data)
+    // console.log(data)
     if (data.indexOf('needs-lidar-registration') > -1) {
       ws.send(`lidar-register/${ID}`)
     }
@@ -47,7 +47,7 @@ lidar
   .init()
   .then(lidar.info)
   .then(info => {
-    ID = info.serialnumber
+    ID = args.name || info.serialnumber
     setupWS()
     return lidar.health()
   })
