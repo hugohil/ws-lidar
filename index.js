@@ -21,7 +21,7 @@ function setupWS () {
     ws.send(`lidar-register/${ID}`)
 
     lidar.on('data', data => {
-      data.serial = ID
+      data.ID = ID
       ws.send(JSON.stringify(data))
     })
   })
